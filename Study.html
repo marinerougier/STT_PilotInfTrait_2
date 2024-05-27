@@ -1,0 +1,931 @@
+<!-- TO DO -->
+<!-- Preload images -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>exp</title>
+  <script src="jspsych-6.0.3/jspsych.js"></script>
+  <script src="jspsych-6.0.3/plugins/jspsych-fullscreen.js"></script>
+  <script src="jspsych-6.0.3/plugins/jspsych-html-keyboard-response.js"></script>
+  <script src="jspsych-6.0.3/plugins/jspsych-html-button-response.js"></script>
+  <script src="jspsych-6.0.3/plugins/jspsych-html-slider-response.js"></script>
+  <script src="jspsych-6.0.3/plugins/jspsych-survey-likert.js"></script>
+  <script src="jspsych-6.0.3/plugins/jspsych-survey-text.js"></script>
+  <script src="jspsych-6.0.3/plugins/jspsych-survey-multi-choice.js"></script>
+  <script src="jsPsych-6.0.3/plugins/jspsych-external-html.js"></script>
+  <script src="jsPsych-6.1.0/plugins/jspsych-external-html.js"></script>
+  <script src="js/jquery.min.js"></script>
+  <script src="js/lodash.min.js"></script>
+  <script src="js/firebase.js"></script>
+  <link href="jspsych-6.0.3/css/jspsych.css" rel="stylesheet" type="text/css">
+  <style>
+    body {
+      cursor: default;
+    }
+
+    .jspsych-content-wrapper {
+      width: 900px;
+      height: 1500px;
+    }
+
+    .paringsImgsLeft,
+    .paringsImgsRight {
+      height: 200px;
+      margin: 0px;
+    }
+
+    .paringsImgsTop{
+      height: 150px;
+      margin: 0px;
+    }
+
+    .paringsImgsLeft {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+
+<body></body>
+
+<script>
+  /* Parameters */
+  var delayIti = 100;  // 100; inter-trial-interval for trials
+  var delayTrial = 2000; // 2000; duration of each trial
+  var numOfUS = 1; // 12; number of US to be paired with each CS
+  var redirectToLink = "https://google.com"; // link to be redirected to at the end of the experiment
+  var FBdirectory = "STT_PilotSpontInf_2" // Firebase directory in which to store the data
+
+  /* Initial variables */
+  var timeline = [];
+  var preloadimages = [];
+  var stims = [];
+  
+  var id = jsPsych.data.getURLVariable("id");
+  id = id == null ? id : jsPsych.randomization.randomID(15); // assign random id if not provided in URL
+  
+  var prolificID = jsPsych.data.getURLVariable("PROLIFIC_PID");
+  if(prolificID == null) {prolificID = "999";}
+
+  /* Material */
+  var Example = [
+    'Example_instr.png'
+  ];
+
+  var Faces_female = [
+// female faces
+    'Faces/Google_1_April Seaton_5_oval.jpg',
+    'Faces/Google_1_Arthur Featherstone_1_oval.jpg',
+    'Faces/Google_1_Delores Creed_19_oval.jpg',
+    'Faces/Google_1_Eileen Hackworth_17_oval.jpg',
+    'Faces/Google_1_Ethel Mcardle_5_oval.jpg',
+    'Faces/Google_1_Felicia Rakes_7_oval.jpg',
+    'Faces/Google_1_Geneva Cline_11_oval.jpg',
+    'Faces/Google_1_Heidi Houghton_5_oval.jpg',
+    'Faces/Google_1_Jeffrey Churchwell_13_oval.jpg',
+    'Faces/Google_1_Laura Hines_7_oval.jpg',
+    'Faces/Google_1_Lynda Stamm_15_oval.jpg',
+    'Faces/Google_1_Roxanne Sales_13_oval.jpg',
+    'Faces/Google_1_Samuel Mansour_16_oval.jpg',
+    'Faces/Google_1_Susan Conant_5_oval.jpg',
+    'Faces/Google_1_Theresa Greenlee_7_oval.jpg',
+    'Faces/Google_1_Wendy Gates_3_oval.jpg',
+    'Faces/Juan_Edmiston_11_oval.jpg',
+    'Faces/wilma-1_oval.jpg',
+  ];
+
+  var Faces_male = [
+    // male faces
+    'Faces/Jonathan_DArden_13_oval.jpg',
+    'Faces/Google_1_Todd Zambrano_3_oval.jpg',
+    'Faces/Google_1_Sean Shores_5_oval.jpg',
+    'Faces/Google_1_Luis Weber_17-oval.jpg',
+    'Faces/Google_1_Lawrence Holman_9_oval.jpg',
+    'Faces/Google_1_Kevin Northrup_9_oval.jpg',
+    'Faces/Google_1_June Nester_1_oval.jpg',
+    'Faces/Google_1_June Boehm_13_oval.jpg',
+    'Faces/Google_1_Joe Bristol_19_oval.jpg',
+    'Faces/Google_1_Jeanne Brian_1_oval.jpg',
+    'Faces/Google_1_Janice Eichhorn_3_oval.jpg',
+    'Faces/Google_1_Harry Bumgardner_1_oval.jpg',
+    'Faces/Google_1_Gertrude Hinojosa_15_oval.jpg',
+    'Faces/Google_1_Eric Strickland_9_oval.jpg',
+    'Faces/Google_1_Debra Manion_15_oval.jpg',
+    'Faces/Google_1_Debra Jankowski_17_oval.jpg',
+    'Faces/Google_1_Curtis Wegner_16_oval.jpg',
+    'Faces/Google_1_Charles Sampson_5_oval (2).jpg'
+  ];
+
+  var Faces_gender = [
+    "male",
+    "male",
+    "male",
+    "male",
+    "male",
+    "male",
+    //"male",
+    //"male",
+    //"male",
+    //"male",
+    //"male",
+    //"male",
+    //"male",
+    //"male",
+    //"male",
+    //"male",
+    //"male",
+    //"male",
+    //"female",
+    //"female",
+    //"female",
+    //"female",
+    //"female",
+    //"female",
+    //"female",
+    //"female",
+    //"female",
+    //"female",
+    //"female",
+    //"female",
+    "female",
+    "female",
+    "female",
+    "female",
+    "female",
+    "female",
+  ];
+
+// 36 behavioral statements (24 trait-implying and 12 filler)
+// 36 faces with 18 female and 18 male 
+// --> 18 statements with gender = male and 18 with gender = female
+
+  // Sentences
+  // trait-implying sentences
+var Trait_sentences_males = [
+    // trait-implying sentences
+    //'Stim_sentences_males/Stim_sentences_males.001.jpeg',
+    'Stim_sentences_males/Stim_sentences_males.002.jpeg',
+    'Stim_sentences_males/Stim_sentences_males.003.jpeg',
+    'Stim_sentences_males/Stim_sentences_males.004.jpeg',
+    'Stim_sentences_males/Stim_sentences_males.005.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.006.jpeg',
+    'Stim_sentences_males/Stim_sentences_males.007.jpeg',
+    'Stim_sentences_males/Stim_sentences_males.008.jpeg',
+    'Stim_sentences_males/Stim_sentences_males.009.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.010.jpeg',
+    'Stim_sentences_males/Stim_sentences_males.011.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.012.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.013.jpeg',
+    'Stim_sentences_males/Stim_sentences_males.014.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.015.jpeg',
+    'Stim_sentences_males/Stim_sentences_males.016.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.017.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.018.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.019.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.020.jpeg',
+    'Stim_sentences_males/Stim_sentences_males.021.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.022.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.023.jpeg',
+    'Stim_sentences_males/Stim_sentences_males.024.jpeg',
+    // filler sentences
+    //'Stim_sentences_males/Stim_sentences_males.025.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.026.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.027.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.028.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.029.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.030.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.031.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.032.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.033.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.034.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.035.jpeg',
+    //'Stim_sentences_males/Stim_sentences_males.036.jpeg',
+]
+
+var Trait_sentences_females = [
+    // trait-implying sentences
+    //'Stim_sentences_females/Stim_sentences_females.001.jpeg',
+    'Stim_sentences_females/Stim_sentences_females.002.jpeg',
+    'Stim_sentences_females/Stim_sentences_females.003.jpeg',
+    'Stim_sentences_females/Stim_sentences_females.004.jpeg',
+    'Stim_sentences_females/Stim_sentences_females.005.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.006.jpeg',
+    'Stim_sentences_females/Stim_sentences_females.007.jpeg',
+    'Stim_sentences_females/Stim_sentences_females.008.jpeg',
+    'Stim_sentences_females/Stim_sentences_females.009.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.010.jpeg',
+    'Stim_sentences_females/Stim_sentences_females.011.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.012.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.013.jpeg',
+    'Stim_sentences_females/Stim_sentences_females.014.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.015.jpeg',
+    'Stim_sentences_females/Stim_sentences_females.016.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.017.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.018.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.019.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.020.jpeg',
+    'Stim_sentences_females/Stim_sentences_females.021.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.022.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.023.jpeg',
+    'Stim_sentences_females/Stim_sentences_females.024.jpeg',
+    // filler sentences
+    //'Stim_sentences_females/Stim_sentences_females.025.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.026.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.027.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.028.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.029.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.030.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.031.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.032.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.033.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.034.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.035.jpeg',
+    //'Stim_sentences_females/Stim_sentences_females.036.jpeg',
+]
+
+var Traits = [
+    // trait-implying sentences
+    //"curious",
+    "cautious",
+    "lazy",
+    "emotional",
+    "insecure",
+    //"nosy",
+    "funny",
+    "smart",
+    "selfish",
+    //"modest",
+    "honest",
+    //"fair",
+    //"neat",
+    "creative",
+    //"generous",
+    "clumsy",
+    //"considerate",
+    //"religious",
+    //"impolite",
+    //"shy",
+    "irresponsible",
+    //"ambitious",
+    //"calm",
+    "forgetful",
+    // Filler sentences
+    //"competent",
+    //"loved",
+    //"competitive",
+    //"offended",
+    //"naive",
+    //"proud",
+    //"confident",
+    //"passive",
+    //"lost",
+    //"inappropriate",
+    //"disciplined",
+    //"chaste",
+]
+
+
+var TypeSentence = [
+    // trait-implying sentences
+    "TraitImp",
+    "TraitImp",
+    "TraitImp",
+    "TraitImp",
+    "TraitImp",
+    "TraitImp",
+    "TraitImp",
+    "TraitImp",
+    "TraitImp",
+    "TraitImp",
+    "TraitImp",
+    "TraitImp",
+    //"TraitImp",
+    //"TraitImp",
+    //"TraitImp",
+    //"TraitImp",
+    //"TraitImp",
+    //"TraitImp",
+    //"TraitImp",
+    //"TraitImp",
+    //"TraitImp",
+    //"TraitImp",
+    //"TraitImp",
+    //"TraitImp",
+    // filler sentences
+    //"Filler",
+    //"Filler",
+    //"Filler",
+    //"Filler",
+    //"Filler",
+    //"Filler",
+    //"Filler",
+    //"Filler",
+    //"Filler",
+    //"Filler",
+    //"Filler",
+    //"Filler",
+]
+
+var Trait_1 = [
+    "<b>Impatient</b>",
+    "<b>Judgmental</b>",
+    "<b>Kind</b>",
+    "<b>Compassionate</b>",
+    "<b>Friendly</b>",
+    "<b>Proud</b>",
+    "<b>Stuck-up</b>",
+    "<b>Kind</b>",
+    "<b>Nurturing</b>",
+    "<b>Humorous</b>",
+    "<b>Caring</b>",
+    "<b>Cocky</b>",
+]
+
+var Trait_2 = [
+    "<b>Honest</b>",
+    "<b>Sharp</b>",
+    "<b>Goofy</b>",
+    "<b>Gossipy</b>",
+    "<b>Kind</b>",
+    "<b>Boastful</b>",
+    "<b>Gossipy</b>",
+    "<b>Talkative</b>",
+    "<b>Kind</b>",
+    "<b>Critical</b>",
+    "<b>Worried</b>",
+    "<b>Critical</b>",
+]
+
+var Trait_3 = [
+    "<b>Critical</b>",
+    "<b>Nosey</b>",
+    "<b>Observant</b>",
+    "<b>Jealous</b>",
+    "<b>Enthusiastic</b>",
+    "<b>Driven</b>",
+    "<b>Nurturing</b>",
+    "<b>Friendly</b>",
+    "<b>Responsible</b>",
+    "<b>Caring</b>",
+    "<b>Attentive</b>",
+    "<b>Moody</b>",
+]
+
+var Trait_4 = [
+    "<b>Outgoing</b>",
+    "<b>Motivated</b>",
+    "<b>Thoughtful</b>",
+    "<b>Insightful</b>",
+    "<b>Smart</b>",
+    "<b>Joyful</b>",
+    "<b>Outgoing</b>",
+    "<b>Admiring</b>",
+    "<b>Proud</b>",
+    "<b>Respectful</b>",
+    "<b>Humorous</b>",
+    "<b>Humorous</b>",
+]
+  /* Functions */
+  // duplicate elements of an array n times
+  // see https://stackoverflow.com/questions/56330349/how-to-duplicate-elements-in-a-js-array-without-creating-dependent-elements?
+  function duplicateElements(elementsArray, times) {
+    var newArray = [];
+    for (let index = 0; index < elementsArray.length; index++) {
+      var currentElement = elementsArray[index];
+      var currentType = typeof currentElement
+      for (let index = 0; index < times; index++) {
+        if (currentType !== "object" && currentType) {
+          newArray.push(currentElement)
+        } else if (currentType === "object" && currentType) {
+          newArray.push({ ...currentElement })
+        }
+      }
+    }
+    return newArray;
+  }
+
+
+  /* RANDOMIZATION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+  /* PAIRING PROCEDURE */
+
+     // Randomly picking female and male faces
+  Faces_female_selection = _.sampleSize(Faces_female, 6);
+  Faces_male_selection = _.sampleSize(Faces_male, 6);
+  var Faces = _.flattenDeep([Faces_male_selection, Faces_female_selection]);
+
+  preloadimages.push(Faces, Trait_sentences_males, Trait_sentences_females, Example);
+
+ 
+ // putting all the information together in the "stim" object
+  //Faces = Faces.map(function(e) {return {Faces: "<img class='paringsImgsLeft' src='" + e + "'>"}});
+  Faces.map(function (e) { stims.push({Faces: "<img class='paringsImgsLeft' src='" + e + "'>"}) });
+  //stims = duplicateElements(stims, numOfUS);
+  stims.map(function (e, i) { e.Faces_gender = Faces_gender[i] });
+  stims = _.shuffle(stims); // randomize order 
+
+  stims.map(function (e, i) { e.Trait_sentences_males = "<img class='paringsImgsRight' src='" + Trait_sentences_males[i] + "'>"});
+  stims.map(function (e, i) { e.Trait_sentences_females = "<img class='paringsImgsRight' src='" + Trait_sentences_females[i] + "'>"});
+  stims.map(function (e, i) { e.Traits = Traits[i] });
+  stims.map(function (e, i) { e.Trait_1 = Trait_1[i] });
+  stims.map(function (e, i) { e.Trait_2 = Trait_2[i] });
+  stims.map(function (e, i) { e.Trait_3 = Trait_3[i] });
+  stims.map(function (e, i) { e.Trait_4 = Trait_4[i] });
+  stims.map(function (e, i) { e.TypeSentence = TypeSentence[i] });
+  stims = _.shuffle(stims); // randomize order 
+
+  /* EXPERIMENT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+  /* FULL SCREEN MODE */
+  var activeFullscreen = {
+    message: "",
+    button_label: "To start the study, please switch to fullscreen",
+    type: 'fullscreen',
+    fullscreen_mode: true,
+    delay_after: 200,
+  };
+
+  // Consent
+var check_consent = function(elem) {
+  if (document.getElementById('info').checked 
+    & document.getElementById('volunt').checked 
+    & document.getElementById('anony').checked 
+    & document.getElementById('end').checked 
+    & document.getElementById('consqc').checked 
+    & document.getElementById('summ').checked 
+    & document.getElementById('participate').checked ) {
+    return true;
+  }
+  else {
+    alert("If you wish to participate, you must check all the boxes.");
+    return false;
+  }
+  return false;
+};
+
+var consent = {
+  type:'external-html',
+  url: "https://marinerougier.github.io/STT_PilotInfTrait/external_page_consent.html",
+  cont_btn: "start",
+  check_fn: check_consent
+};
+
+  /* General INSTRUCTIONS */
+ /*
+  var Quit_expe = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Before starting...</h1>";
+      html += "<p class='justify'>You can quit the study at any time by closing the browser window. However, please be aware ";
+      html += "that this will <b>end your participation</b>. If you are certain that you want to quit or encounter technical issues ";
+      html += "that force you to quit, <b>you can still receive a partial reward proportionate to the time you actually spent</b> on ";
+      html += "the study. If this occurs, please take the following steps: Return the study via the Prolific study page as ";
+      html += "quickly as possible (please do not submit unless you have completed the study and received a completion code). ";
+      html += "Send a message to the researcher via the Prolific study page, stating that you completed part of the study ";
+      html += "(this will ensure that the researcher knows you should receive a partial reward). </br></br> ";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to continue</p>";
+      return html;
+    },
+  };
+*/ 
+
+  var Instr_gene0 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Study on person perception</h1>";
+      html += "<p class='justify'>Before the study, we asked a number of people to describe the behavior of somebody they know (i.e., an acquaintance). During the study, on each trial, you will see a <b>photograph of a person and the description of his/her acquaintance's behavior. </b><br><br>Here is an example of trial: <br>";
+      html += "<center><img src = 'Example_instr.png'></center></b><br>";
+      html += "<p class='justify'>The behavioral description comes from longer statements that each person on the picture has provided in response to questions from an interviewer.";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to continue</p>";
+      return html;
+    },
+};
+
+  var Instr_gene1 = {
+    type: "html-keyboard-response",
+    post_trial_gap: 300,
+    choices: [32],
+    stimulus: function() {
+      var html = "";
+      html += "<h1>Study on person perception</h1>";
+      html += "<p class='justify'>Your task is to <b>look carefully at all the information provided on the screen </b>(the person on the photograph and the description of the acquaintance's behavior) and to <b>imagine what <u>the person on the photograph</u> could be like.</b><br><br>";
+      html += "More specifically, your task will be to <b>rate the person on the photograph</b> on a series of personality traits.<br><br> ";
+      html += "It is very important that you answer honestly, based on what you truly think. <br><br> ";
+      html += "<p></br>Press <span class='light-keys'><kbd>space</kbd></span> to start the task</p>";
+      return html;
+    },
+};
+
+ /* Pairings */
+ /*
+var behav_rel = {
+    timeline_variables: stims,
+    randomize_order: true,
+    timeline: [{
+      type: 'survey-text',
+      preamble: function () {
+        if (jsPsych.timelineVariable('Faces_gender', true) == "male") {
+          var leftImg = jsPsych.timelineVariable('Faces', true);
+          var target_trait = jsPsych.timelineVariable('Traits', true);
+          var rightImg = jsPsych.timelineVariable('Trait_sentences_females', true);
+        } else {
+          var leftImg = jsPsych.timelineVariable('Faces', true);
+          var target_trait = jsPsych.timelineVariable('Traits', true);
+          var rightImg = jsPsych.timelineVariable('Trait_sentences_males', true);
+        };
+        html = '';
+        html += leftImg ;
+        html += rightImg ;
+        html += '<br><br><br>Base on the above information, indicate in the response boxes below <b>which personality traits the person in the photograph </b>might possess: (indicate <b>at least one trait</b>)';
+        return html;
+      },
+      questions: [{prompt: "", required: true},
+                  {prompt: "", required: true},
+                  {prompt: "", required: true}],
+      button_label: "continue",
+        loop_function: function (data) {
+        	//var res = jsPsych.data.get().last(1).values()[0].responses;
+            var res = data.values()[0].responses;
+            var res = JSON.parse(res).Q0;
+            if (res == "") {
+                alert("Please answer the question");
+                return true;
+            }
+        },
+        }],
+      on_finish: function (data) {
+        $('.jspsych-content').css({ "max-width": "90%" });
+        data.task = "behav_rel";
+        data.Faces = jsPsych.timelineVariable('Faces', true);
+        data.SentFemale = jsPsych.timelineVariable('Trait_sentences_females', true);
+        data.SentMale = jsPsych.timelineVariable('Trait_sentences_males', true);
+        data.Traits = jsPsych.timelineVariable('Traits', true);
+        data.FacesGender = jsPsych.timelineVariable('Faces_gender', true);
+        var parsed_response  = JSON.parse(data.responses);
+        data.trait1    = parsed_response.Q0;
+        data.trait2    = parsed_response.Q1;
+        data.trait3    = parsed_response.Q2;
+      },
+  };
+/*
+
+ /* Pairings */
+var scale = ["0</br>Not at all", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10</br>Very much"];
+
+var behav_rel = {
+    timeline_variables: stims,
+    randomize_order: true,
+    timeline: [{
+      type: 'survey-likert',
+      preamble: function () {
+        if (jsPsych.timelineVariable('Faces_gender', true) == "male") {
+          var leftImg = jsPsych.timelineVariable('Faces', true);
+          var target_trait = jsPsych.timelineVariable('Traits', true);
+          var rightImg = jsPsych.timelineVariable('Trait_sentences_females', true);
+        } else {
+          var leftImg = jsPsych.timelineVariable('Faces', true);
+          var target_trait = jsPsych.timelineVariable('Traits', true);
+          var rightImg = jsPsych.timelineVariable('Trait_sentences_males', true);
+        };
+        html = '';
+        html += leftImg ;
+        html += rightImg ;
+        html += "<br>To what extent do you think that <u>the person on the photograph</u> possesses each of the trait listed below</b>?<br><br>";
+        return html;
+      },
+      questions: [
+          {prompt: jsPsych.timelineVariable('Trait_1'), labels: scale, required: true},
+          {prompt: jsPsych.timelineVariable('Trait_2'), labels: scale, required: true},
+          {prompt: jsPsych.timelineVariable('Trait_3'), labels: scale, required: true},
+          {prompt: jsPsych.timelineVariable('Trait_4'), labels: scale, required: true},
+        ],
+       on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("max-width", "100%");
+          $(".jspsych-survey-likert-statement").css("margin", "0px");
+          $(".jspsych-survey-likert-statement").css("padding", "0px");
+          $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
+          $("#jspsych-survey-likert-next").css("margin-top", "10px");
+          $("#jspsych-survey-likert-form").css("width", "800px");
+          $("li").css("width", "9%");
+        },
+      on_finish: function (data) {
+        $('.jspsych-content').css({ "max-width": "90%" });
+        data.task = "behav_rel";
+        data.Faces = jsPsych.timelineVariable('Faces', true);
+        data.SentFemale = jsPsych.timelineVariable('Trait_sentences_females', true);
+        data.SentMale = jsPsych.timelineVariable('Trait_sentences_males', true);
+        data.Traits = jsPsych.timelineVariable('Traits', true);
+        data.trait_1 = jsPsych.timelineVariable('Trait_1', true);
+        data.trait_2 = jsPsych.timelineVariable('Trait_2', true);
+        data.trait_3 = jsPsych.timelineVariable('Trait_3', true);
+        data.trait_4 = jsPsych.timelineVariable('Trait_4', true);
+        data.FacesGender = jsPsych.timelineVariable('Faces_gender', true);
+        var parsed_response  = JSON.parse(data.responses);
+        data.trait1    = parsed_response.Q0;
+        data.trait1    = parsed_response.Q1;
+        data.trait1    = parsed_response.Q2;
+        data.trait1    = parsed_response.Q3;
+      },
+    }]
+  };
+
+  /* Exploratory questions */
+  var demand_awareness = {
+        timeline: [{
+            type: 'survey-text',
+            questions: [{ prompt: 'What do you think the researchers were trying to achieve in this study?', rows: 3, columns: 60 }],
+            button_label: "continue",
+        }],
+        loop_function: function (data) {
+            var res = data.values()[0].responses;
+            var res = JSON.parse(res).Q0;
+            if (res == "") {
+                alert("Please answer the question");
+                return true;
+            }
+        },
+        on_finish: function (data) {
+            jsPsych.data.addProperties({
+                demand_awareness: JSON.parse(data.responses).Q0,
+            });
+        },
+    };
+
+/*
+   var demand_compliance = {
+      type: 'survey-multi-choice',
+      questions: [{prompt: "When we asked you to guess the personality of the person on the photograph, did you tell us the truth about what you think? Or did you just fake your response (i.e., tell us what you thought we wanted to hear)? Please be honest here (it will not affect payment in any way).", options: ['Yes - I faked my response based on what I thought the researchers wanted to find', 'No - my responses were based on how I genuinely felt', 'I do not know'], required: true}],
+      button_label: "Continue",
+      on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("margin-top", "200px");
+          $(".jspsych-content").css("max-width", "90%");
+        },
+      on_finish: function(data) {
+          jsPsych.data.addProperties({
+              demand_compliance: JSON.parse(data.responses)["Q0"],
+          });
+      },
+  };
+*/
+
+  var influence_behavior_awareness = {
+      type: 'survey-multi-choice',
+      questions: [{prompt: "In general, do you think that the behavioral statement was useful to draw conclusions on the personality of the person on the photograph?", options: ['Yes', 'No', 'I do not know'], required: true}],
+      button_label: "Continue",
+      on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("margin-top", "200px");
+          $(".jspsych-content").css("max-width", "90%");
+        },
+      on_finish: function(data) {
+          jsPsych.data.addProperties({
+              influence_behavior_awareness: JSON.parse(data.responses)["Q0"],
+          });
+      },
+  };
+
+  var influence_behavior_specific = {
+    timeline: [{
+      type: 'survey-text',
+      questions: [{ prompt: "Please explain <b>in what ways</b> the behavioral statement was useful to draw conclusions on the personality of the person on the photograph:", rows: 3, columns: 60 }],
+      button_label: "continue",
+    }],
+    loop_function: function (data) {
+      var influence_behavior_specific = data.values()[0].responses;
+      var influence_behavior_specific = JSON.parse(influence_behavior_specific).Q0;
+      if (influence_behavior_specific == "") {
+        alert("Please answer the question!");
+        return true;
+      }
+    },
+    on_load: function () {
+      $(".jspsych-content").css("max-width", "90%");
+    },
+    on_finish: function (data) {
+      jsPsych.data.addProperties({
+        influence_behavior_specific: JSON.parse(data.responses)["Q0"],
+      });
+    },
+  };
+
+// HEXACO-PI 60
+var scale_explo = ["0</br>Not at all", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10</br>Totally"];
+
+    var Explo_questionnaire = {
+        type: 'survey-likert',
+        preamble: "",
+        questions: [
+          {prompt: "Do you think that the person on the photograph and the acquaintance this person described are alike (e.g., have similar personalities)? Please use the scale below to answer.", labels: scale_explo, required: true},
+          {prompt: "<br>Do you think that the person on the picture talked about a behavior that he or she agreed with? Please use the scale below to answer.", labels: scale_explo, required: true}
+        ],
+        randomize_question_order: false,
+        button_label: 'Continue',
+        on_load: function() {
+          window.scrollTo(0, 0);
+          $(".jspsych-content").css("max-width", "100%");
+          $(".jspsych-content").css("margin-top", "200px");
+          $(".jspsych-survey-likert-statement").css("margin", "0px");
+          $(".jspsych-survey-likert-statement").css("padding", "0px");
+          $(".jspsych-survey-likert-opts").css("padding", "0 0 10px");
+          $("#jspsych-survey-likert-next").css("margin-top", "10px");
+          $("#jspsych-survey-likert-form").css("width", "800px");
+          $("li").css("width", "9%");
+        },
+        on_finish: function(data) {
+          jsPsych.data.addProperties({
+          alike: JSON.parse(data.responses).Q0,
+          agreed: JSON.parse(data.responses).Q1,
+          });
+        },
+    };
+
+
+  /* DEMO */
+  var age = {
+    timeline: [{
+      type: 'survey-text',
+      questions: [{ prompt: "Please indicate your age:", rows: 1, columns: 10 }],
+      button_label: "continue",
+    }],
+    loop_function: function (data) {
+      var age = data.values()[0].responses;
+      var age = JSON.parse(age).Q0;
+      if (age == "") {
+        alert("Please indicate your age!");
+        return true;
+      }
+    },
+    on_load: function () {
+      $(".jspsych-content").css("max-width", "90%");
+    },
+    on_finish: function (data) {
+      jsPsych.data.addProperties({
+        age: JSON.parse(data.responses)["Q0"],
+      });
+    },
+  };
+
+  var genderOptions = ['Male', 'Female', 'Other'];
+  var gender = {
+    type: 'survey-multi-choice',
+    questions: [{ prompt: "Please indicate your gender:", options: genderOptions, required: true }],
+    button_label: "continue",
+    on_finish: function (data) {
+      jsPsych.data.addProperties({
+        gender: JSON.parse(data.responses)["Q0"],
+      });
+    },
+  };
+
+var languageOptions = ['Native speaker', 'Very well', 'Well', 'Average', 'Badly', 'Very badly'];
+  var language = {
+        type: 'survey-multi-choice',
+        questions: [{ prompt: "How well do you speak english?", options: languageOptions, required: true }],
+        button_label: "continue",
+        on_finish: function (data) {
+            jsPsych.data.addProperties({
+                language: JSON.parse(data.responses).Q0,
+            });
+            console.log(data);
+        },
+    };
+
+  var Prolific_reported = {
+        timeline: [{
+            type: 'survey-text',
+            questions: [{ prompt: 'Please indicate your Prolific ID:', rows: 3, columns: 60 }],
+            button_label: "continue",
+        }],
+        loop_function: function (data) {
+            var res = data.values()[0].responses;
+            var res = JSON.parse(res).Q0;
+            if (res == "") {
+                alert("Please answer the question");
+                return true;
+            }
+        },
+        on_finish: function (data) {
+            jsPsych.data.addProperties({
+                Prolific_reported: JSON.parse(data.responses).Q0,
+            });
+        },
+    };
+
+  var comments = {
+        timeline: [{
+            type: 'survey-text',
+            questions: [{ prompt: 'Do you have comments regarding this study? [Optional]', rows: 3, columns: 60 }],
+            button_label: "continue",
+        }],
+        on_finish: function (data) {
+            jsPsych.data.addProperties({
+                Comment: JSON.parse(data.responses).Q0,
+            });
+        },
+    };
+
+  /* DEBRIEF */
+  var debrief = "";
+  debrief += "<h1>End of the study</h1>";
+  debrief += "<p class='justify'>Thank you for participating in this online study!<br><br> ";
+  debrief += "The goal of this study was to assess how people infer personality traits (e.g., 'lazy') to individuals ";
+  debrief += "on the basis of what these individuals report about another person's behavior (e.g., 'he stayed in bed all day'). ";
+  debrief += "Specifically, we would like to understand the reasoning people have when they do so. ";
+  debrief += "Again, your responses will be anonymous and will be analyzed as part of a group of responses.</br></br> ";
+  debrief += "We hope this explanation was clear. If you want additional information, if you have any questions, or if you would like ";
+  debrief += "to withdraw consent and have your data excluded, do not hesitate to contact us via Prolific Academic. If you are "; 
+  debrief += "interested, you can also ask for the results of this experiment—be aware, however, that this could take several weeks "; 
+  debrief += "to gather all the data we need and to analyze them. <br><br>";
+  debrief += "You can copy this code on Prolific: <b>1848E97F</b> ";
+  debrief += "or you can click on the following link to validate your participation:</p>";
+  debrief += "<a href='https://app.prolific.com/submissions/complete?cc=1848E97F' target='_blank'>click here</a>";
+
+  /* TIMELINES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+  timeline.push(activeFullscreen);
+                //consent);
+
+  timeline.push(Instr_gene0,
+                Instr_gene1,
+                behav_rel,
+                demand_awareness,
+                influence_behavior_awareness,
+                {
+                  timeline: [influence_behavior_specific],
+                  conditional_function: function(){
+                      // get the data from the previous trial,
+                      // and push the question only if 'yes' response
+                      var res2 = jsPsych.data.get().last(1).values()[0].responses;
+                      res2 = JSON.parse(res2).Q0;
+                      console.log(res2);
+                      if(res2 === "Yes"){
+                          return true;
+                      } else {
+                          return false;
+                      }
+                  }
+                },
+                Explo_questionnaire,
+                age,
+                gender,
+                language,
+                Prolific_reported,
+                comments);
+
+  preloadimages = _.flattenDeep(preloadimages);
+  timeline = _.flattenDeep(timeline);
+
+  /* INITIALISE EXP  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+  jsPsych.init({
+    timeline: timeline,
+    preload_images: preloadimages,
+    max_load_time: 300 * 1000,
+    exclusions: {
+      min_width: 600,
+      min_height: 500,
+    },
+    on_finish: function (data) {
+      $("#jspsych-content").html("<img src='https://i.gifer.com/4V0b.gif'>");
+
+      /* Initialize Firebase */
+      var config = {
+        apiKey: "AIzaSyBwDr8n-RNCbBOk1lKIxw7AFgslXGcnQzM",
+        databaseURL: "https://postdocgent.firebaseio.com/"
+      };
+
+      firebase.initializeApp(config);
+      var database = firebase.database();
+
+      // if no id provided, generate a new id
+      if (id == null) { id = jsPsych.randomization.randomID(15) };
+
+      /* jsPsych: add data to every trial */
+      jsPsych.data.addProperties({
+        id: id,
+        prolificID: prolificID,
+        totalTime: jsPsych.totalTime()
+      });
+
+      var data_behav_rel = data.filter({ task: 'behav_rel' }).csv();
+
+      /* Send data to Firebase */
+      database
+        .ref(FBdirectory + "/" + id + "/")
+        .update({ data_behav_rel })
+        .then(function () {
+          console.log("Data sent!");
+          $("#jspsych-content").html(debrief);
+          setTimeout(jsPsych.data.displayData, 1500000);
+      });
+    }
+  });
+</script>
+
+</html>

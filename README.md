@@ -1,1 +1,1 @@
-# STT_PilotInfTrait_2
+# STT_PilotInfTrait
