@@ -629,9 +629,9 @@ var behav_rel = {
         data.FacesGender = jsPsych.timelineVariable('Faces_gender', true);
         var parsed_response  = JSON.parse(data.responses);
         data.trait1    = parsed_response.Q0;
-        data.trait1    = parsed_response.Q1;
-        data.trait1    = parsed_response.Q2;
-        data.trait1    = parsed_response.Q3;
+        data.trait2    = parsed_response.Q1;
+        data.trait3    = parsed_response.Q2;
+        data.trait4    = parsed_response.Q3;
       },
     }]
   };
@@ -849,8 +849,8 @@ var languageOptions = ['Native speaker', 'Very well', 'Well', 'Average', 'Badly'
   debrief += "<a href='https://app.prolific.com/submissions/complete?cc=1848E97F' target='_blank'>click here</a>";
 
   /* TIMELINES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-  timeline.push(activeFullscreen);
-                //consent);
+  timeline.push(activeFullscreen,
+                consent);
 
   timeline.push(Instr_gene0,
                 Instr_gene1,
